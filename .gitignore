@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+
+# Environment
+.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded / generated data (never commit user data)
+data/uploads/*
+!data/uploads/.gitkeep
+data/working/*
+!data/working/.gitkeep
+data/reports/*
+!data/reports/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node (not used, but just in case)
+node_modules/

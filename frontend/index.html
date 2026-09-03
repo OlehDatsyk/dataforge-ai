@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DataForge AI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>" />
+<link rel="stylesheet" href="/static/css/style.css" />
+<script src="/static/js/vendor/chart.umd.js"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-name">🛠️ DataForge AI</div>
+      <div class="brand-sub">AI-Powered Data Analysis, Insights &amp; Reporting Platform</div>
+    </div>
+    <ul class="nav-list" id="nav-list">
+      <li class="nav-item active" data-view="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></li>
+      <li class="nav-item" data-view="datasets"><span class="nav-icon">📁</span><span class="nav-label">Datasets</span></li>
+      <li class="nav-item" data-view="profile"><span class="nav-icon">🔍</span><span class="nav-label">Profile</span></li>
+      <li class="nav-item" data-view="cleaning"><span class="nav-icon">🧹</span><span class="nav-label">Cleaning</span></li>
+      <li class="nav-item" data-view="explore"><span class="nav-icon">🧮</span><span class="nav-label">Explore</span></li>
+      <li class="nav-item" data-view="charts"><span class="nav-icon">📈</span><span class="nav-label">Charts</span></li>
+      <li class="nav-item" data-view="ask"><span class="nav-icon">💬</span><span class="nav-label">Ask Your Data</span></li>
+      <li class="nav-item" data-view="analyst"><span class="nav-icon">🤖</span><span class="nav-label">AI Analyst</span></li>
+      <li class="nav-item" data-view="reports"><span class="nav-icon">📄</span><span class="nav-label">Reports</span></li>
+      <li class="nav-item" data-view="history"><span class="nav-icon">🕘</span><span class="nav-label">History</span></li>
+      <li class="nav-item" data-view="providers"><span class="nav-icon">🔌</span><span class="nav-label">AI Providers</span></li>
+      <li class="nav-item" data-view="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></li>
+    </ul>
+    <div class="sidebar-footer">Built by Oleh Datsyk</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <div class="dataset-pill" id="active-dataset-pill">No dataset selected</div>
+        <label class="toggle" title="Toggle dark mode">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section id="view-dashboard" class="view active">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Dashboard</h1>
+            <div class="section-desc">Live counts from your DataForge AI database - nothing here is fabricated.</div>
+          </div>
+        </div>
+        <div class="grid grid-4" id="dashboard-stats"></div>
+        <div class="grid grid-2" style="margin-top:18px;">
+          <div class="panel">
+            <div class="panel-title">Recent Datasets</div>
+            <div id="dashboard-recent-datasets"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Recent Activity</div>
+            <div id="dashboard-recent-history"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DATASETS -->
+      <section id="view-datasets" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Datasets</h1>
+            <div class="section-desc">Upload CSV, Excel (.xlsx/.xls), JSON or TSV files for analysis.</div>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone">
+          <div class="icon">⬆️</div>
+          <div><strong>Click to upload</strong> or drag a file here</div>
+          <div class="small muted">CSV · XLSX · XLS · JSON · TSV - up to <span id="max-upload-mb">15</span> MB</div>
+          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.json,.tsv" hidden />
+        </div>
+        <div id="upload-progress"></div>
+        <div id="upload-result"></div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <span>All Datasets</span>
+            <button class="btn btn-sm" id="refresh-datasets-btn">↻ Refresh</button>
+          </div>
+          <div id="datasets-table"></div>
+        </div>
+
+        <div class="panel" id="dataset-overview-panel" style="display:none;">
+          <div class="panel-title">Dataset Overview</div>
+          <div id="dataset-overview"></div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="view-profile" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Data Profile</h1>
+            <div class="section-desc">Per-column statistics calculated directly with pandas/numpy.</div>
+          </div>
+          <button class="btn btn-primary" id="refresh-profile-btn">↻ Refresh Profile</button>
+        </div>
+        <div id="profile-content"></div>
+      </section>
+
+      <!-- CLEANING -->
+      <section id="view-cleaning" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Data Cleaning Workspace</h1>
+            <div class="section-desc">Operations apply only to your working copy. The original upload is never modified.</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn" id="ai-cleaning-suggest-btn">🤖 AI Suggestions</button>
+            <button class="btn btn-danger" id="reset-dataset-btn">⟲ Reset to Original</button>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="panel">
+            <div class="panel-title">Apply Operation</div>
+            <div id="cleaning-form"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">AI Cleaning Suggestions</div>
+            <div id="ai-cleaning-suggestions"><p class="muted small">Click "AI Suggestions" above to get recommendations grounded in your dataset profile.</p></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Transformation History</div>
+          <div id="cleaning-history"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Working Data Preview</div>
+          <div id="cleaning-preview"></div>
+        </div>
+      </section>
+
+      <!-- EXPLORE -->
+      <section id="view-explore" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Explore</h1>
+            <div class="section-desc">Deterministic statistical analysis - every number below is calculated, not guessed.</div>
+          </div>
+        </div>
+        <div class="tabs" id="explore-tabs">
+          <button class="tab-btn active" data-tab="descriptive">Descriptive</button>
+          <button class="tab-btn" data-tab="missing">Missing Values</button>
+          <button class="tab-btn" data-tab="duplicates">Duplicates</button>
+          <button class="tab-btn" data-tab="outliers">Outliers</button>
+          <button class="tab-btn" data-tab="correlation">Correlation</button>
+          <button class="tab-btn" data-tab="category">Category</button>
+          <button class="tab-btn" data-tab="group">Grouped</button>
+          <button class="tab-btn" data-tab="timeseries">Time Series</button>
+          <button class="tab-btn" data-tab="kpi">KPI Builder</button>
+        </div>
+        <div id="explore-panels"></div>
+      </section>
+
+      <!-- CHARTS -->
+      <section id="view-charts" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Charts</h1>
+            <div class="section-desc">Charts render only real aggregated data from your dataset.</div>
+          </div>
+        </div>
+        <div class="panel" id="chart-form-panel"></div>
+        <div class="panel">
+          <div class="panel-title">
+            <span>Chart</span>
+            <button class="btn btn-sm" id="explain-chart-btn" disabled>🤖 Explain Chart</button>
+          </div>
+          <div class="chart-canvas-wrap"><canvas id="main-chart"></canvas></div>
+          <div id="chart-empty" class="empty-state"><div class="icon">📈</div>Configure and generate a chart above.</div>
+        </div>
+        <div class="panel" id="chart-explanation-panel" style="display:none;">
+          <div class="panel-title">AI Chart Explanation</div>
+          <div id="chart-explanation"></div>
+        </div>
+      </section>
+
+      <!-- ASK YOUR DATA -->
+      <section id="view-ask" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Ask Your Data</h1>
+            <div class="section-desc">Your question is matched to a predefined deterministic calculation - no AI-generated code ever runs.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="form-row">
+            <label>Your question</label>
+            <input type="text" id="ask-input" placeholder="e.g. Which region has the highest revenue?" />
+          </div>
+          <div class="form-grid" style="grid-template-columns: 1fr auto;">
+            <div>
+              <label>AI Provider</label>
+              <select id="ask-provider">
+                <option value="auto">Automatic (with fallback)</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Claude</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </div>
+            <div style="align-self:end;">
+              <button class="btn btn-primary" id="ask-btn">Ask</button>
+            </div>
+          </div>
+          <div class="small muted">Try: "What is the average revenue?", "Which region has the highest revenue?", "How many customers are in each region?"</div>
+        </div>
+        <div id="ask-result"></div>
+      </section>
+
+      <!-- AI ANALYST -->
+      <section id="view-analyst" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">AI Data Analyst</h1>
+            <div class="section-desc">AI interprets verified statistics only. It never invents numbers.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="form-grid">
+            <div>
+              <label>AI Provider</label>
+              <select id="analyst-provider">
+                <option value="auto">Automatic (with fallback)</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Claude</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </div>
+            <div>
+              <label>Focus (optional)</label>
+              <input type="text" id="analyst-focus" placeholder="e.g. regional performance" />
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="run-insights-btn">🤖 Generate AI Analyst Report</button>
+            <button class="btn" id="run-business-insights-btn">💡 Generate Business Insights</button>
+          </div>
+        </div>
+        <div id="analyst-meta"></div>
+        <div id="analyst-result"></div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="view-reports" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Reports</h1>
+            <div class="section-desc">Combines verified statistics with optional AI interpretation into an exportable report.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="form-grid">
+            <div>
+              <label>Report Type</label>
+              <select id="report-type">
+                <option value="dataset_profile">Dataset Profile Report</option>
+                <option value="data_quality">Data Quality Report</option>
+                <option value="business_analysis">Business Analysis Report</option>
+                <option value="kpi">KPI Report</option>
+                <option value="trend">Trend Analysis Report</option>
+                <option value="executive_summary">Executive Summary</option>
+              </select>
+            </div>
+            <div>
+              <label>Export Format</label>
+              <select id="report-format">
+                <option value="markdown">Markdown</option>
+                <option value="html">HTML</option>
+                <option value="txt">Plain Text</option>
+                <option value="json">JSON</option>
+              </select>
+            </div>
+            <div>
+              <label>AI Provider</label>
+              <select id="report-provider">
+                <option value="auto">Automatic (with fallback)</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Claude</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </div>
+            <div>
+              <label>Include AI Interpretation</label>
+              <label class="toggle" style="margin-top:6px;">
+                <input type="checkbox" id="report-include-ai" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="generate-report-btn">Generate Report</button>
+        </div>
+        <div class="panel" id="report-output-panel" style="display:none;">
+          <div class="panel-title">
+            <span id="report-output-title">Report</span>
+            <button class="btn btn-sm" id="download-report-btn">⬇ Download</button>
+          </div>
+          <div id="report-output"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Previously Generated Reports</div>
+          <div id="reports-list"></div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="view-history" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Analysis History</h1>
+            <div class="section-desc">Every analysis run is logged with its parameters, results, and timing.</div>
+          </div>
+          <div class="flex">
+            <label class="small" style="margin:0;">Filter:</label>
+            <select id="history-filter-scope" style="width:auto;">
+              <option value="current">Current dataset</option>
+              <option value="all">All datasets</option>
+            </select>
+          </div>
+        </div>
+        <div id="history-table"></div>
+      </section>
+
+      <!-- AI PROVIDERS -->
+      <section id="view-providers" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">AI Provider Status</h1>
+            <div class="section-desc">API keys are never displayed. Latency shown is from the most recent test.</div>
+          </div>
+          <button class="btn btn-primary" id="test-all-btn">Test All Providers</button>
+        </div>
+        <div id="providers-panel"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" class="view">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Settings</h1>
+            <div class="section-desc">Local preferences and platform information.</div>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="panel">
+            <div class="panel-title">Appearance</div>
+            <div class="flex-between">
+              <span>Dark mode</span>
+              <label class="toggle"><input type="checkbox" id="theme-toggle-2" /><span class="slider"></span></label>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Data Privacy</div>
+            <p class="small">Uploaded datasets may contain personal or sensitive data. DataForge AI sends only aggregated
+              statistics and selected values to AI providers - never entire raw datasets. Nothing is logged to AI
+              provider request logs beyond what is required to generate an explanation.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">About</div>
+          <p class="small">DataForge AI - AI-Powered Data Analysis, Insights &amp; Reporting Platform.<br/>Built by Oleh Datsyk.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-title" id="confirm-modal-title">Confirm Action</div>
+    <div id="confirm-modal-body" class="small"></div>
+    <div class="modal-actions">
+      <button class="btn" id="confirm-modal-cancel">Cancel</button>
+      <button class="btn btn-danger" id="confirm-modal-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
